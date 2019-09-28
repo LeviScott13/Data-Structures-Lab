@@ -1,0 +1,144 @@
+//**************************************
+// Levi Sutton
+// Lab 12
+//**************************************
+
+template <typename T>
+unsigned int heap<T>::max_child(unsigned int index) const{
+    
+    unsigned int leftChild = index * 2 + 1;
+    unsigned int rightChild = index * 2 + 2;
+
+    assert(data.size() > leftChild);
+
+    if (data.size() > rightChild){
+        if (data[leftChild] > data[rightChild])
+            return leftChild;
+
+        else
+            return rightChild;
+    }
+
+    else{
+        return leftChild;
+
+    }
+}
+
+template <typename T>
+heap<T>::heap(){
+
+    count = 0;
+}
+
+template <typename T>
+unsigned int heap<T>::size() const{
+
+    return data.size();
+}
+
+template <typename T>
+bool heap<T>::is_empty() const{
+
+    if (size() == 0)
+        return true;
+    else
+       return false;
+
+}
+
+template <typename T>
+void heap<T>::insert(const T& item){
+
+    data.push_back(item);
+
+    unsigned int childIndex = size() - 1;
+    unsigned int parentIndex = (childIndex - 1) / 2;
+
+    order[childIndex] = ++count;
+
+    if (parentIndex < 0)
+        return;
+
+    while (childIndex > 0){
+
+        if (data[parentIndex] < data[childIndex]){
+
+            int t = order[childIndex];
+            order[childIndex] = order[parentIndex];
+            order[parentIndex] = t;
+
+            T tmp = data[parentIndex];
+
+            data[parentIndex] = data[childIndex];
+            data[childIndex] = tmp;
+
+            childIndex = parentIndex;
+            parentIndex = (childIndex - 1) / 2;
+
+        }
+
+        else{
+            break;
+        }
+    }   
+}
+
+template <typename T>
+void heap<T>::remove(){
+
+    assert(!is_empty());
+
+    if (size() == 1){
+
+        data.erase(data.begin());
+        return;
+
+    }
+
+    data[0] = data[data.size() - 1];
+    order[0] = order[data.size() - 1];
+
+    data.erase(data.begin() + data.size() - 1);
+
+    unsigned int parentIndex = 0;
+    unsigned int childIndex = 0;
+
+    while (size() > parentIndex * 2 + 1){
+
+        childIndex = max_child(parentIndex);
+
+        if (data[childIndex] > data[parentIndex]){
+
+
+            int t = order[childIndex];
+
+            order[childIndex] = order[parentIndex];
+            order[parentIndex] = t;
+
+            T tmp = data[parentIndex];
+
+            data[parentIndex] = data[childIndex];
+            data[childIndex] = tmp;
+
+            parentIndex = childIndex;
+        }
+
+        else{
+            break;
+        }
+    }
+}
+template <typename T>
+T heap<T>::max() const{
+
+    assert(!is_empty());
+    return data[0];
+}
+
+template <typename T>
+T& heap<T>::max(){
+
+    assert(!is_empty());
+    return data[0];
+}

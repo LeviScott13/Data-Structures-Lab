@@ -1,0 +1,188 @@
+//Levi Sutton 
+
+#include "node2.h"
+#include "sequence4.h"
+#include <cassert>
+#include <cstdlib>
+
+namespace main_savitch_6B{
+
+	template<typename T>
+	sequence<T>::sequence(){
+		node<T> head_ptr = NULL;
+		node<T> tail_ptr = NULL;
+		node<T> cursor = NULL;
+		node<T> precursor = NULL;
+		many_nodes = 0;
+	}
+
+	template<typename T>
+	sequence<T>::sequence(const sequence& source){
+		many_nodes = source.many_nodes;
+		list_copy(source.head_ptr, head_ptr, tail_ptr);
+		node<T>* val;
+		val = source.head_ptr;
+		precursor = head_ptr;
+
+		if(source.cursor == NULL){
+			if(source.precursor == NULL){
+				cursor = NULL;
+				precursor = NULL;
+			}
+			else{
+				precursor = tail_ptr;
+				cursor = NULL;
+			}
+		}
+		else{
+			if(source.precursor == NULL){
+				cursor = head_ptr;
+				precursor = NULL;
+			}
+			else{
+				while(val != source.precursor){
+					val = val -> link();
+					precursor = precursor -> link();
+				}
+				cursor = precursor -> link();
+			}
+		}
+	}
+
+	template<typename T>
+	sequence<T>::~sequence(){
+		list_clear(head_ptr);
+	}
+
+	template<typename T>
+	void sequence<T>::start(){
+		cursor = head_ptr;
+		precursor = NULL;
+	}
+
+	template<typename T>
+	void sequence<T>::advance(){
+		if(is_item()){
+			precursor = cursor;
+			cursor = cursor -> link();
+		}
+		else{
+			start();
+		}
+	}
+
+	template<typename T>
+	void sequence<T>::insert(const T& entry){
+		if(is_item()){
+			if(precursor != NULL){
+				list_insert(precursor, entry);
+				cursor = precursor -> link();
+			}
+			else{
+				list_head_insert(head_ptr, entry);
+				precursor = NULL;
+				cursor = head_ptr;
+			}
+		}
+		else{
+			if(many_nodes == 0){
+				list_head_insert(head_ptr, entry);
+				precursor = NULL;
+				cursor = head_ptr;
+				tail_ptr = head_ptr;
+			}
+			else{
+				list_head_insert(head_ptr, entry);
+				precursor = NULL;
+				cursor = head_ptr;
+			}
+		}
+		many_nodes++;
+	}
+
+	template<typename T>
+	void sequence<T>::attach(const T& entry){
+		if(is_item()){
+			if(cursor -> link() == NULL){
+				list_insert(cursor, entry);
+				precursor = cursor;
+				cursor = cursor -> link();
+				tail_ptr = cursor;
+			}
+			else{
+				list_insert(cursor, entry);
+				precursor = cursor;
+				cursor = cursor -> link();
+			}
+		}
+		else{
+			if(many_nodes == 0){
+				list_head_insert(head_ptr, entry);
+				precursor = NULL;
+				cursor = head_ptr;
+				tail_ptr = head_ptr;
+			}
+			else{
+				precursor = tail_ptr;
+				list_insert(tail_ptr, entry);
+				tail_ptr = tail_ptr -> link();
+				cursor = tail_ptr;
+			}
+		}
+		many_nodes++;
+	}
+
+	template<typename T>
+	void sequence<T>::operator=(const sequence& source){
+		many_nodes = source.many_nodes;
+		list_copy(source.head_ptr, head_ptr, tail_ptr);
+		node<T>* val;
+		val = source.head_ptr;
+		precursor = head_ptr;
+
+		if(source.cursor == NULL){
+			if(source.precursor == NULL){
+				cursor = NULL;
+				precursor = NULL;
+			}
+			else{
+				precursor = tail_ptr;
+				cursor = NULL;
+			}
+		}
+		else{
+			if(source.precursor == NULL){
+				cursor = head_ptr;
+				precursor = NULL;
+			}
+			else{
+				while(val != source.precursor){
+					val = val -> link();
+					precursor = precursor -> link();
+				}
+				cursor = precursor -> link();
+			}
+		}
+	}
+
+	template<typename T>
+	void sequence<T>::remove_current(){
+		if(is_item()){
+			many_nodes--;
+			
+			if(precursor == NULL){
+				list_head_remove(head_ptr);
+				cursor = head_ptr;
+			}
+			else{
+				cursor = cursor -> link();
+				list_remove(precursor);
+			}
+		}
+	}
+
+	template<typename T>
+	sequence<T>::value_type sequence::current() const {
+		return cursor -> data();
+	}
+}

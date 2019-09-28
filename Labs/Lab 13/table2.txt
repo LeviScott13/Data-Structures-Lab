@@ -1,0 +1,97 @@
+//Levi Sutton
+
+#include <cassert> 
+#include "table2.h"
+using namespace std;
+
+namespace main_savitch_12B
+{
+    template <class RecordType>
+    table<RecordType>::table()
+    {
+        int size = 0;
+    }
+  
+    template <class RecordType>  
+    void table<RecordType>::insert(const RecordType& entry)
+    {
+        assert(entry.key >= 0);
+        std::size_t index = hash(entry.key);
+      
+        if(!is_present(entry.key)){
+            data[index].push_back(entry);
+            ++size;
+        }
+        else{
+            remove(entry.key);
+            data[index].push_back(entry);
+        }
+    }
+  
+    template <class RecordType>
+    void table<RecordType>::remove(int key)
+    {
+        std::size_t index = hash(key);
+        if(!is_present(key))
+            return;
+        else{
+            typename std::list<RecordType>::iterator iter;
+            for(iter = data[index].begin(); iter != data[index].end(); ++iter){
+                if(iter->key == key){
+                    data[index].erase(iter);
+                    --size;
+                    break;
+                }
+            }
+        }
+    }
+  
+    template <class RecordType>   
+    bool table<RecordType>::is_present(int key) const
+    {
+        std::size_t index = hash(key);
+        typename std::list<RecordType>::const_iterator iter;
+
+        for(iter = data[index].begin(); iter != data[index].end(); ++iter){
+            if(iter->key == key)
+                return true;
+        }
+        return false;      
+    }
+
+    template <typename RecordType>
+    RecordType table<RecordType>::get_record (int key) const {
+
+        return key;
+    }
+
+    template <typename RecordType>
+    size_t table<RecordType>::size( ) const {
+
+        return get_record;
+    }
+
+    template <class RecordType>
+    std::size_t table<RecordType>::hash(int key) const
+    {
+        return (key % NUM_BUCKETS);
+    }
+
+    template <class RecordType>  
+    void table<RecordType>::find_location(int key, bool& found, RecordType& result) const
+    {
+        std::size_t index = hash(key);
+        if(is_present(key)){
+            found = true;
+
+            typename std::list<RecordType>::const_iterator iter;
+            for(iter = data[index].begin(); iter != data[index].end(); ++iter){
+                if(iter->key == key)
+                    result = *iter;
+                    return;
+            }
+        }
+        else
+            found = false;
+    }
+}
